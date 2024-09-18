@@ -57,7 +57,7 @@ const keysToMidi = {
 const keysThatAreDown = {}
 
 document.addEventListener('keydown', async (event) => {
-    if (!context) { await onStartButton() }
+    // if (!context) { await onStartButton() }
     const midi = keysToMidi[event.key.toLowerCase()]
     if (!midi) { return } // Not one of the recognised keys
     if (keysThatAreDown[midi] === true) { return } // Already down, ignore key-repeat.
