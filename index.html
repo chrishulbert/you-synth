@@ -1,14 +1,60 @@
-<html>
-    <body>
-        <h1>JS Audio Synth</h1>
-
-        <button id="button-start" disabled>START</button>
-
-        <div>
-            <p>Press keys ASDFGHJKL for Middle C4 through D5.</p>
-            <p>WE TYU O are for sharps.</p>
-        </div>
-
-        <script src="SynthMain.js" type="module"></script>
-    </body>
+<html color-mode="user">
+<head>
+  <title>YouSynth</title>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css" /> 
+</head>
+<body>
+  <header>
+    <h1>JS Audio Synth</h1>
+    <p>Press keys ASDFGHJKL for Middle C4 through D5.
+    WE TYU O are for sharps.</p>
+    <button id="button-start" disabled>START</button>
+  </header>
+  <main>  
+    <table>
+      <tr>
+        <td></td>
+        <th>Carrier</th>
+        <th>Modulator</th>
+      </tr>
+      <tr>
+        <th>Wave</th>
+        <td>Sine</td>
+        <td>Sawtooth</td>
+      </tr>
+      <tr>
+        <th>Attack</th>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Decay</th>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Sustain</th>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Release</th>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Frequency</th>
+        <td>n/a</td>
+        <td>2x</td>
+      </tr>
+      <tr>
+        <th>Amplitude</th>
+        <td>n/a</td>
+        <td>1</td>
+      </tr>
+    </table>
+  </main>
+  
+  <script src="SynthMain.js" type="module"></script>
+</body>
 </html>
