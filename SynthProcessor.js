@@ -23,8 +23,8 @@ class Envelope {
     state = StateIdle
     attack = 0.01 // Seconds
     decay = 0.2 // Seconds
-    sustain = 0.8 // % of volume
-    release = 0.2 // Seconds
+    sustain = 0.5 // % of volume
+    release = 0.5 // Seconds
     //attackPerFrame = 0
     value = 0
 
@@ -71,9 +71,9 @@ class Voice {
     carrierWave = WaveSine
     modulatorEnvelope = new Envelope()
     modulatorFrequency = 440
-    modulatorMultiple = 2
-    modulatorWave = WaveSine
-    modulatorAmplitude = 1
+    modulatorMultiple = 4
+    modulatorWave = WaveSquare
+    modulatorAmplitude = 0.5
     midiNote = 0
 
     release() {
@@ -132,7 +132,17 @@ class SynthProcessor extends AudioWorkletProcessor {
                 this.release(parseInt(parts[1]))
             } else if (command == 'ra') {
                 this.releaseAll()
+            } else if (command == 's') {
+                this.setParameter(parts[1], parts[2])
             }
+        }
+    }
+
+    setParameter(which, value) {
+        if (which == 'carrierWave') {
+            this.voices.forEach(v => v.carrierWave = parseInt(value))
+        } else if (which == 'modulatorWave') {
+            this.voices.forEach(v => v.modulatorWave = parseInt(value))
         }
     }
 

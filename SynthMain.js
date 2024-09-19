@@ -15,7 +15,8 @@ const startSynth = async () => {
     node.onprocessorerror = (err) => {
         console.log(err)
     }
-    node.connect(context.destination);
+    node.connect(context.destination)
+    parameters.sendAllValuesAtStartup()
 }
 
 const onStartButton = async () => {
@@ -29,12 +30,27 @@ const onStartButton = async () => {
         alert(err)
     }
 }
+const keysThatAreDown = {}
+const onDown = async (midi) => {
+    // if (!context) { await onStartButton() }
+    if (keysThatAreDown[midi] === true) { return } // Already down, ignore key-repeat.
+    node?.port.postMessage(`p,${midi}`)
+    keysThatAreDown[midi] = true
+    document.querySelector(`.key[midi="${midi}"]`)?.classList.add('on')
+}
+const onUp = (midi) => {
+    if (!keysThatAreDown[midi]) { return } // Already up, ignore mouseup-repeat.
+    node?.port.postMessage(`r,${midi}`)
+    keysThatAreDown[midi] = false
+    document.querySelector(`.key[midi="${midi}"]`)?.classList.remove('on')
+}
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const button = document.getElementById('button-start')
-    button.onclick = onStartButton
-    button.disabled = false
-});
+const onKeyboardMouseDown = async (e) => {
+    await onDown(parseInt(e.target.getAttribute('midi')))
+}
+const onKeyboardMouseUp = (e) => {
+    onUp(parseInt(e.target.getAttribute('midi')))
+}
 
 // Middle row of querty starts with c4, with sharps on the row above.
 const keysToMidi = {
@@ -53,25 +69,93 @@ const keysToMidi = {
     'k': 72, // C5
     'o': 73, // C#5
     'l': 74, // D5
+    'p': 75, // D#5
+    ';': 76, // E5
+    ':': 76, // E5
 }
-const keysThatAreDown = {}
-
 document.addEventListener('keydown', async (event) => {
-    // if (!context) { await onStartButton() }
     const midi = keysToMidi[event.key.toLowerCase()]
     if (!midi) { return } // Not one of the recognised keys
-    if (keysThatAreDown[midi] === true) { return } // Already down, ignore key-repeat.
-    node?.port.postMessage(`p,${midi}`)
-    keysThatAreDown[midi] = true
+    await onDown(midi)
 });
 document.addEventListener('keyup', (event) => {
     const midi = keysToMidi[event.key.toLowerCase()]
     if (!midi) { return } // Not one of the recognised keys
-    node?.port.postMessage(`r,${midi}`)
-    keysThatAreDown[midi] = false
+    onUp(midi)
 });
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
         node?.port.postMessage('ra')
     }
 });
+
+document.addEventListener("DOMContentLoaded", async () => {
+    // Set up the 'start' button.
+    const button = document.getElementById('button-start')
+    button.onclick = onStartButton
+    button.disabled = false
+
+    // Set up the keys.
+    for (let k of document.getElementsByClassName('key')) {
+        k.onmousedown = onKeyboardMouseDown
+        k.onmouseup = onKeyboardMouseUp
+        k.onmouseout = onKeyboardMouseUp
+    }
+
+    setupParameterUIOnLoad()
+});
+
+// -=[ The UI for customising the values ]=-
+
+const WaveSine = 0
+const WaveSquare = 1
+const WaveTriangle = 2
+const WaveSawtooth = 3
+class Parameters {
+    carrierWave = WaveSquare
+    modulatorWave = WaveTriangle
+
+    setCarrierWave(value) {
+        this.carrierWave = value
+        node?.port.postMessage(`s,carrierWave,${value}`)
+    }
+    setModulatorWave(value) {
+        this.modulatorWave = value
+        node?.port.postMessage(`s,modulatorWave,${value}`)
+    }
+    sendAllValuesAtStartup() {
+        node?.port.postMessage(`s,carrierWave,${this.carrierWave}`)
+        node?.port.postMessage(`s,modulatorWave,${this.modulatorWave}`)
+    }
+}
+const parameters = new Parameters()
+function waveIdFromCode(code) {
+    if (code=='sine')     { return WaveSine }
+    if (code=='square')   { return WaveSquare }
+    if (code=='triangle') { return WaveTriangle }
+    if (code=='sawtooth') { return WaveSawtooth }
+    return WaveSine
+}
+function waveCodeFromId(id) {
+    if (id==WaveSine)     { return 'sine' }
+    if (id==WaveSquare)   { return 'square' }
+    if (id==WaveTriangle) { return 'triangle' }
+    if (id==WaveSawtooth) { return 'sawtooth' }
+    return 'sine'
+}
+
+const setupParameterUIOnLoad = () => {
+    // Firstly apply the parameters to the UI.
+    const carrierWave = document.getElementById('carrier-wave')
+    const modulatorWave = document.getElementById('modulator-wave')
+    carrierWave.value = waveCodeFromId(parameters.carrierWave)
+    modulatorWave.value = waveCodeFromId(parameters.modulatorWave)
+
+    // Now listen for changes.
+    carrierWave.onchange = (e) => {
+        parameters.setCarrierWave(waveIdFromCode(e.target.value))
+    }
+    modulatorWave.onchange = (e) => {
+        parameters.setModulatorWave(waveIdFromCode(e.target.value))
+    }
+}
