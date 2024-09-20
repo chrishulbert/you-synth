@@ -5,19 +5,30 @@
   <link rel="stylesheet" href="mvp.css" /> 
 </head>
 <body>
-  <header>
-    <h1>YouSynth</h1>
-    <p><em>The synthesizer where <u>you</u> control the parameters, to make samples that are uniquely yours.</em></p>
-    <button id="button-start" disabled>START</button>
-    <p><sup>HELP</sup>Press keys ASDFGHJKL for Middle C4 through D5.
-      WE TYU O are for sharps.</p>
-    </header>
   <main>
     <section>
-      <datalist id="datalist-0-2">
-        <option value="0"></option>
-        <option value="2"></option>
-      </datalist>
+      <header>
+        <h1>YouSynth</h1>
+        <p><em>The synthesizer where <u>you</u> control the parameters, to make samples that are uniquely yours.</em></p>
+        <button id="button-start" disabled>START</button>
+        </header>
+    </section>
+    <section>
+        <div class="piano">
+          <div class="key white" midi="60"><span>C4</span><div class="key black" midi="61"></div></div>
+          <div class="key white" midi="62"><span>D</span><div class="key black" midi="63"></div></div>
+          <div class="key white" midi="64"><span>E</span></div>
+          <div class="key white" midi="65"><span>F</span><div class="key black" midi="66"></div></div>
+          <div class="key white" midi="67"><span>G</span><div class="key black" midi="68"></div></div>
+          <div class="key white" midi="69"><span>A</span><div class="key black" midi="70"></div></div>
+          <div class="key white" midi="71"><span>B</span></div>
+          <div class="key white" midi="72"><span>C5</span><div class="key black" midi="73"></div></div>
+          <div class="key white" midi="74"><span>D</span><div class="key black" midi="75"></div></div>
+          <div class="key white" midi="76"><span>E</span></div>
+        </div>
+        <p class="piano-help">Press keys ASDFGHJKL for Middle C4 through D5. WE TYU O are for sharps.</p>
+    </section>
+    <section>
       <table>
         <tr>
           <td></td>
@@ -45,53 +56,70 @@
         </tr>
         <tr>
           <th>Attack</th>
-          <td><label id="carrier-attack-label" for="carrier-attack">0.1s</label><input id="carrier-attack" type="range" min="0" max="2"></td>
-          <td><label id="modulator-attack-label" for="modulator-attack">0.1s</label><input id="modulator-attack" type="range" min="0" max="2"></td>
+          <td>
+            <label id="carrier-attack-label" for="carrier-attack">0.1s</label>
+            <input id="carrier-attack" type="range" min="0.01" max="2" step="0.01">
+          </td>
+          <td>
+            <label id="modulator-attack-label" for="modulator-attack">0.1s</label>
+            <input id="modulator-attack" type="range" min="0.01" max="2" step="0.01">
+          </td>
         </tr>
         <tr>
           <th>Decay</th>
-          <td><label for="carrier-decay">0.1s</label><input id="carrier-decay" type="range" min="0" max="2" step="0.1" list="datalist-0-2" ></td>
-          <td><label for="carrier-decay">0.1s</label><input id="carrier-decay" type="range" min="0" max="2" step="0.1"></td>
+          <td>
+            <label id="carrier-decay-label" for="carrier-decay">0.1s</label>
+            <input id="carrier-decay" type="range" min="0.01" max="2" step="0.01">
+          </td>
+          <td>
+            <label id="modulator-decay-label" for="modulator-decay">0.1s</label>
+            <input id="modulator-decay" type="range" min="0.01" max="2" step="0.01">
+          </td>
         </tr>
         <tr>
           <th>Sustain</th>
-          <td></td>
-          <td></td>
+          <td>
+            <label id="carrier-sustain-label" for="carrier-sustain"></label>
+            <input id="carrier-sustain" type="range" min="0" max="1" step="0.1">
+          </td>
+          <td>
+            <label id="modulator-sustain-label" for="modulator-sustain"></label>
+            <input id="modulator-sustain" type="range" min="0" max="1" step="0.1">
+          </td>
         </tr>
         <tr>
           <th>Release</th>
-          <td></td>
-          <td></td>
+          <td>
+            <label id="carrier-release-label" for="carrier-release">0.1s</label>
+            <input id="carrier-release" type="range" min="0.01" max="2" step="0.01">
+          </td>
+          <td>
+            <label id="modulator-release-label" for="modulator-release">0.1s</label>
+            <input id="modulator-release" type="range" min="0.01" max="2" step="0.01">
+          </td>
         </tr>
         <tr>
           <th>Frequency</th>
           <td>n/a</td>
-          <td>2x</td>
+          <td>
+            <label id="modulator-multiple-label" for="modulator-release">1x</label>
+            <input id="modulator-multiple" type="range" min="0" max="20" step="1" list="frequencies">
+          </td>
         </tr>
         <tr>
           <th>Amplitude</th>
           <td>n/a</td>
-          <td>1</td>
+          <td>
+            <label id="modulator-amplitude-label" for="modulator-amplitude">0.1s</label>
+            <input id="modulator-amplitude" type="range" min="0" max="4" step="0.1">
+          </td>
         </tr>
       </table>
-    </section>
-    <section>
-      <div class="piano">
-        <div class="key white" midi="60"><span>C4</span><div class="key black" midi="61"></div></div>
-        <div class="key white" midi="62"><span>D</span><div class="key black" midi="63"></div></div>
-        <div class="key white" midi="64"><span>E</span></div>
-        <div class="key white" midi="65"><span>F</span><div class="key black" midi="66"></div></div>
-        <div class="key white" midi="67"><span>G</span><div class="key black" midi="68"></div></div>
-        <div class="key white" midi="69"><span>A</span><div class="key black" midi="70"></div></div>
-        <div class="key white" midi="71"><span>B</span></div>
-        <div class="key white" midi="72"><span>C5</span><div class="key black" midi="73"></div></div>
-        <div class="key white" midi="74"><span>D</span><div class="key black" midi="75"></div></div>
-        <div class="key white" midi="76"><span>E</span></div>
-      </div>
     </section>
   </main>
 
   <style>
+    /* Piano: */
     .piano {
       border: 1px solid #777;
       user-select: none;
@@ -127,6 +155,14 @@
       text-align: center;
       color: #888;
       pointer-events: none;
+    }
+    .piano-help {
+      text-align: center;
+    }
+
+    /* Editor: */
+    input[type="range"] {
+      width: 25em;
     }
   </style>
   

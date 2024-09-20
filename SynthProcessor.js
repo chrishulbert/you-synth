@@ -143,6 +143,26 @@ class SynthProcessor extends AudioWorkletProcessor {
             this.voices.forEach(v => v.carrierWave = parseInt(value))
         } else if (which == 'modulatorWave') {
             this.voices.forEach(v => v.modulatorWave = parseInt(value))
+        } else if (which == 'carrierAttack') {
+            this.voices.forEach(v => v.carrierEnvelope.attack = parseFloat(value))
+        } else if (which == 'modulatorAttack') {
+            this.voices.forEach(v => v.modulatorEnvelope.attack = parseFloat(value))
+        } else if (which == 'carrierDecay') {
+            this.voices.forEach(v => v.carrierEnvelope.decay = parseFloat(value))
+        } else if (which == 'modulatorDecay') {
+            this.voices.forEach(v => v.modulatorEnvelope.decay = parseFloat(value))
+        } else if (which == 'carrierSustain') {
+            this.voices.forEach(v => v.carrierEnvelope.sustain = parseFloat(value))
+        } else if (which == 'modulatorSustain') {
+            this.voices.forEach(v => v.modulatorEnvelope.sustain = parseFloat(value))
+        } else if (which == 'carrierRelease') {
+            this.voices.forEach(v => v.carrierEnvelope.release = parseFloat(value))
+        } else if (which == 'modulatorRelease') {
+            this.voices.forEach(v => v.modulatorEnvelope.release = parseFloat(value))
+        } else if (which == 'modulatorMultiple') {
+            this.voices.forEach(v => v.modulatorMultiple = parseFloat(value))
+        } else if (which == 'modulatorAmplitude') {
+            this.voices.forEach(v => v.modulatorAmplitude = parseFloat(value))
         }
     }
 

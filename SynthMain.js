@@ -24,7 +24,7 @@ const onStartButton = async () => {
     button.disabled = true
     try {
         await startSynth()
-        button.textContent = 'Playing...';
+        button.textContent = 'Started...';
     } catch (err) {
         console.log(err)
         alert(err)
@@ -32,7 +32,7 @@ const onStartButton = async () => {
 }
 const keysThatAreDown = {}
 const onDown = async (midi) => {
-    // if (!context) { await onStartButton() }
+    if (!context) { await onStartButton() } // Auto-start.
     if (keysThatAreDown[midi] === true) { return } // Already down, ignore key-repeat.
     node?.port.postMessage(`p,${midi}`)
     keysThatAreDown[midi] = true
@@ -114,6 +114,16 @@ const WaveSawtooth = 3
 class Parameters {
     carrierWave = WaveSquare
     modulatorWave = WaveTriangle
+    carrierAttack = 0.01
+    modulatorAttack = 0.01
+    carrierDecay = 0.2
+    modulatorDecay = 0.2
+    carrierSustain = 0.5
+    modulatorSustain = 0.5
+    carrierRelease = 0.5
+    modulatorRelease = 0.5
+    modulatorMultiple = 4
+    modulatorAmplitude = 1
 
     setCarrierWave(value) {
         this.carrierWave = value
@@ -123,9 +133,59 @@ class Parameters {
         this.modulatorWave = value
         node?.port.postMessage(`s,modulatorWave,${value}`)
     }
+    setCarrierAttack(value) {
+        this.carrierAttack = value
+        node?.port.postMessage(`s,carrierAttack,${value}`)
+    }
+    setModulatorAttack(value) {
+        this.modulatorAttack = value
+        node?.port.postMessage(`s,modulatorAttack,${value}`)
+    }
+    setCarrierDecay(value) {
+        this.carrierDecay = value
+        node?.port.postMessage(`s,carrierDecay,${value}`)
+    }
+    setModulatorDecay(value) {
+        this.modulatorDecay = value
+        node?.port.postMessage(`s,modulatorDecay,${value}`)
+    }
+    setCarrierSustain(value) {
+        this.carrierSustain = value
+        node?.port.postMessage(`s,carrierSustain,${value}`)
+    }
+    setModulatorSustain(value) {
+        this.modulatorSustain = value
+        node?.port.postMessage(`s,modulatorSustain,${value}`)
+    }
+    setCarrierRelease(value) {
+        this.carrierRelease = value
+        node?.port.postMessage(`s,carrierRelease,${value}`)
+    }
+    setModulatorRelease(value) {
+        this.modulatorRelease = value
+        node?.port.postMessage(`s,modulatorRelease,${value}`)
+    }
+    setModulatorMultiple(value) {
+        this.modulatorMultiple = value
+        node?.port.postMessage(`s,modulatorMultiple,${value}`)
+    }
+    setModulatorAmplitude(value) {
+        this.modulatorAmplitude = value
+        node?.port.postMessage(`s,modulatorAmplitude,${value}`)
+    }
     sendAllValuesAtStartup() {
         node?.port.postMessage(`s,carrierWave,${this.carrierWave}`)
         node?.port.postMessage(`s,modulatorWave,${this.modulatorWave}`)
+        node?.port.postMessage(`s,carrierAttack,${this.carrierAttack}`)
+        node?.port.postMessage(`s,modulatorAttack,${this.modulatorAttack}`)
+        node?.port.postMessage(`s,carrierDecay,${this.carrierDecay}`)
+        node?.port.postMessage(`s,modulatorDecay,${this.modulatorDecay}`)
+        node?.port.postMessage(`s,carrierSustain,${this.carrierSustain}`)
+        node?.port.postMessage(`s,modulatorSustain,${this.modulatorSustain}`)
+        node?.port.postMessage(`s,carrierRelease,${this.carrierRelease}`)
+        node?.port.postMessage(`s,modulatorRelease,${this.modulatorRelease}`)
+        node?.port.postMessage(`s,modulatorMultiple,${this.modulatorMultiple}`)
+        node?.port.postMessage(`s,modulatorAmplitude,${this.modulatorAmplitude}`)
     }
 }
 const parameters = new Parameters()
@@ -145,11 +205,53 @@ function waveCodeFromId(id) {
 }
 
 const setupParameterUIOnLoad = () => {
-    // Firstly apply the parameters to the UI.
+    // Get the DOM elements.
     const carrierWave = document.getElementById('carrier-wave')
     const modulatorWave = document.getElementById('modulator-wave')
+    const carrierAttack = document.getElementById('carrier-attack')
+    const modulatorAttack = document.getElementById('modulator-attack')
+    const carrierAttackLabel = document.getElementById('carrier-attack-label')
+    const modulatorAttackLabel = document.getElementById('modulator-attack-label')
+    const carrierDecay = document.getElementById('carrier-decay')
+    const modulatorDecay = document.getElementById('modulator-decay')
+    const carrierDecayLabel = document.getElementById('carrier-decay-label')
+    const modulatorDecayLabel = document.getElementById('modulator-decay-label')
+    const carrierSustain = document.getElementById('carrier-sustain')
+    const modulatorSustain = document.getElementById('modulator-sustain')
+    const carrierSustainLabel = document.getElementById('carrier-sustain-label')
+    const modulatorSustainLabel = document.getElementById('modulator-sustain-label')
+    const carrierRelease = document.getElementById('carrier-release')
+    const modulatorRelease = document.getElementById('modulator-release')
+    const carrierReleaseLabel = document.getElementById('carrier-release-label')
+    const modulatorReleaseLabel = document.getElementById('modulator-release-label')
+    const modulatorMultiple = document.getElementById('modulator-multiple')
+    const modulatorMultipleLabel = document.getElementById('modulator-multiple-label')
+    const modulatorAmplitude = document.getElementById('modulator-amplitude')
+    const modulatorAmplitudeLabel = document.getElementById('modulator-amplitude-label')
+
+    // Firstly apply the parameters to the UI.
     carrierWave.value = waveCodeFromId(parameters.carrierWave)
     modulatorWave.value = waveCodeFromId(parameters.modulatorWave)
+    carrierAttack.value = parameters.carrierAttack
+    modulatorAttack.value = parameters.modulatorAttack
+    carrierAttackLabel.textContent = `${parameters.carrierAttack}s`
+    modulatorAttackLabel.textContent = `${parameters.modulatorAttack}s`
+    carrierDecay.value = parameters.carrierDecay
+    modulatorDecay.value = parameters.modulatorDecay
+    carrierDecayLabel.textContent = `${parameters.carrierDecay}s`
+    modulatorDecayLabel.textContent = `${parameters.modulatorDecay}s`
+    carrierSustain.value = parameters.carrierSustain
+    modulatorSustain.value = parameters.modulatorSustain
+    carrierSustainLabel.textContent = `${parameters.carrierSustain * 100}%`
+    modulatorSustainLabel.textContent = `${parameters.modulatorSustain * 100}%`
+    carrierRelease.value = parameters.carrierRelease
+    modulatorRelease.value = parameters.modulatorRelease
+    carrierReleaseLabel.textContent = `${parameters.carrierRelease}s`
+    modulatorReleaseLabel.textContent = `${parameters.modulatorRelease}s`
+    modulatorMultiple.value = 8 + (parameters.modulatorMultiple * 2)
+    modulatorMultipleLabel.textContent = `${parameters.modulatorMultiple}x`
+    modulatorAmplitude.value = parameters.modulatorAmplitude
+    modulatorAmplitudeLabel.textContent = `${(parameters.modulatorAmplitude * 100).toFixed(0)}%`
 
     // Now listen for changes.
     carrierWave.onchange = (e) => {
@@ -157,5 +259,55 @@ const setupParameterUIOnLoad = () => {
     }
     modulatorWave.onchange = (e) => {
         parameters.setModulatorWave(waveIdFromCode(e.target.value))
+    }
+    carrierAttack.oninput = (e) => {
+        parameters.setCarrierAttack(parseFloat(e.target.value))
+        carrierAttackLabel.textContent = `${parameters.carrierAttack}s`
+    }
+    modulatorAttack.oninput = (e) => {
+        parameters.setModulatorAttack(parseFloat(e.target.value))
+        modulatorAttackLabel.textContent = `${parameters.modulatorAttack}s`
+    }
+    carrierDecay.oninput = (e) => {
+        parameters.setCarrierDecay(parseFloat(e.target.value))
+        carrierDecayLabel.textContent = `${parameters.carrierDecay}s`
+    }
+    modulatorDecay.oninput = (e) => {
+        parameters.setModulatorDecay(parseFloat(e.target.value))
+        modulatorDecayLabel.textContent = `${parameters.modulatorDecay}s`
+    }
+    carrierSustain.oninput = (e) => {
+        parameters.setCarrierSustain(parseFloat(e.target.value))
+        carrierSustainLabel.textContent = `${parameters.carrierSustain * 100}%`
+    }
+    modulatorSustain.oninput = (e) => {
+        parameters.setModulatorSustain(parseFloat(e.target.value))
+        modulatorSustainLabel.textContent = `${parameters.modulatorSustain * 100}%`
+    }
+    carrierRelease.oninput = (e) => {
+        parameters.setCarrierRelease(parseFloat(e.target.value))
+        carrierReleaseLabel.textContent = `${parameters.carrierRelease}s`
+    }
+    modulatorRelease.oninput = (e) => {
+        parameters.setModulatorRelease(parseFloat(e.target.value))
+        modulatorReleaseLabel.textContent = `${parameters.modulatorRelease}s`
+    }
+    modulatorMultiple.oninput = (e) => {
+        const rawValue = parseFloat(e.target.value)
+        let value = 0
+        let displayValue = ""
+        if (rawValue >= 10) {
+            value = (rawValue - 8) / 2
+            displayValue = `${value}x`
+        } else {
+            value = 1 / (11 - rawValue)
+            displayValue = `1/${11 - rawValue}x`
+        }
+        parameters.setModulatorMultiple(value)
+        modulatorMultipleLabel.textContent = `${displayValue}`
+    }
+    modulatorAmplitude.oninput = (e) => {
+        parameters.setModulatorAmplitude(parseFloat(e.target.value))
+        modulatorAmplitudeLabel.textContent = `${(parameters.modulatorAmplitude * 100).toFixed(0)}%`
     }
 }
