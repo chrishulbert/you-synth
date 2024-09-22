@@ -7,7 +7,7 @@ const startSynth = async () => {
         sampleRate: 44100,
     });
     await context.audioWorklet.addModule('SynthProcessor.js');
-    // await context.audioWorklet.addModule('SynthProcessor.js?cache=' + (new Date().getTime()));
+    // await context.audioWorklet.addModule('SynthProcessor.js?cachebuster=' + (new Date().getTime()));
     node = new AudioWorkletNode(context, 'synthProcessor', { 
         numberOfInputs: 0,
         outputChannelCount: [1],
