@@ -228,6 +228,7 @@ const setupParameterUIOnLoad = () => {
     const modulatorMultipleLabel = document.getElementById('modulator-multiple-label')
     const modulatorAmplitude = document.getElementById('modulator-amplitude')
     const modulatorAmplitudeLabel = document.getElementById('modulator-amplitude-label')
+    const randomise = document.getElementById('randomise')
 
     // Firstly apply the parameters to the UI.
     carrierWave.value = waveCodeFromId(parameters.carrierWave)
@@ -292,22 +293,51 @@ const setupParameterUIOnLoad = () => {
         parameters.setModulatorRelease(parseFloat(e.target.value))
         modulatorReleaseLabel.textContent = `${parameters.modulatorRelease}s`
     }
+    // Takes 0..20 inclusive, returns the value and display text.
+    const rawMultipleToValueAndDisplay = (raw) => {
+        if (raw >= 10) {
+            const value = (raw - 8) / 2
+            return {
+                value,
+                displayValue: `${value}x`,
+            }
+        } else {
+            return {
+                value: 1 / (11 - raw),
+                displayValue: `1/${11 - raw}x`,
+            }
+        }
+    }
     modulatorMultiple.oninput = (e) => {
         const rawValue = parseFloat(e.target.value)
-        let value = 0
-        let displayValue = ""
-        if (rawValue >= 10) {
-            value = (rawValue - 8) / 2
-            displayValue = `${value}x`
-        } else {
-            value = 1 / (11 - rawValue)
-            displayValue = `1/${11 - rawValue}x`
-        }
+        const { value, displayValue } = rawMultipleToValueAndDisplay(rawValue)
         parameters.setModulatorMultiple(value)
         modulatorMultipleLabel.textContent = `${displayValue}`
     }
     modulatorAmplitude.oninput = (e) => {
         parameters.setModulatorAmplitude(parseFloat(e.target.value))
         modulatorAmplitudeLabel.textContent = `${(parameters.modulatorAmplitude * 100).toFixed(0)}%`
+    }
+    randomise.onclick = (e) => {
+        carrierAttack.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
+        carrierAttack.value = parameters.carrierAttack
+        modulatorAttack.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
+        modulatorAttack.value = parameters.modulatorAttack
+        carrierDecay.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
+        carrierDecay.value = parameters.carrierDecay
+        modulatorDecay.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
+        modulatorDecay.value = parameters.modulatorDecay
+        carrierSustain.oninput({ target: { value: Math.round(10 * Math.random())/10 }})
+        carrierSustain.value = parameters.carrierSustain
+        modulatorSustain.oninput({ target: { value: Math.round(10 * Math.random())/10 }})
+        modulatorSustain.value = parameters.modulatorSustain
+        carrierRelease.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
+        carrierRelease.value = parameters.carrierRelease
+        modulatorRelease.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
+        modulatorRelease.value = parameters.modulatorRelease
+        modulatorAmplitude.oninput({ target: { value: Math.round(40 * Math.random())/10 }})
+        modulatorAmplitude.value = parameters.modulatorAmplitude
+        modulatorMultiple.value = Math.round(20 * Math.random())
+        modulatorMultiple.oninput({ target: modulatorMultiple })
     }
 }
