@@ -203,6 +203,9 @@ function waveCodeFromId(id) {
     if (id==WaveSawtooth) { return 'sawtooth' }
     return 'sine'
 }
+function randomWaveId() {
+    return Math.round(Math.random() * WaveSawtooth)
+}
 
 const setupParameterUIOnLoad = () => {
     // Get the DOM elements.
@@ -255,11 +258,11 @@ const setupParameterUIOnLoad = () => {
     modulatorAmplitudeLabel.textContent = `${(parameters.modulatorAmplitude * 100).toFixed(0)}%`
 
     // Now listen for changes.
-    carrierWave.onchange = (e) => {
-        parameters.setCarrierWave(waveIdFromCode(e.target.value))
+    carrierWave.oninput = () => {
+        parameters.setCarrierWave(waveIdFromCode(carrierWave.value))
     }
-    modulatorWave.onchange = (e) => {
-        parameters.setModulatorWave(waveIdFromCode(e.target.value))
+    modulatorWave.oninput = () => {
+        parameters.setModulatorWave(waveIdFromCode(modulatorWave.value))
     }
     carrierAttack.oninput = (e) => {
         parameters.setCarrierAttack(parseFloat(e.target.value))
@@ -319,6 +322,10 @@ const setupParameterUIOnLoad = () => {
         modulatorAmplitudeLabel.textContent = `${(parameters.modulatorAmplitude * 100).toFixed(0)}%`
     }
     randomise.onclick = (e) => {
+        carrierWave.value = waveCodeFromId(randomWaveId())
+        carrierWave.oninput()
+        modulatorWave.value = waveCodeFromId(randomWaveId())
+        modulatorWave.oninput()
         carrierAttack.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
         carrierAttack.value = parameters.carrierAttack
         modulatorAttack.oninput({ target: { value: Math.round(200 * Math.random())/100 }})
