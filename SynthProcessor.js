@@ -52,7 +52,7 @@ class Envelope {
         } else if (this.state == StateSustaining) {
             // Do nothing, just remain at this level until the note is released.
         } else if (this.state == StateReleasing) {
-            const releasePerFrame = this.sustain / SampleRate / this.release;
+            const releasePerFrame = 1 / SampleRate / this.release; // Not proportional to sustain in case sustain is eg 1% and they release at the peak, it'll take forever to decay.
             const newValue = this.value - releasePerFrame;
             if (newValue <= 0) {
                 this.value = 0.;
