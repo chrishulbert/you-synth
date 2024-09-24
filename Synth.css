@@ -1,0 +1,88 @@
+/* General: */
+nav {
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.1);
+    height: 4em;
+    align-items: center;
+    padding: 0.5em;
+}
+
+button {
+    color: #fff;
+    background-color: #118bee;
+    border-radius: 0.5em;
+    border-width: 0;
+    padding: 1em;
+}
+
+button:hover {
+    background-color: #219bfe;
+}
+
+button:active {
+    background-color: #017bde;
+}
+
+button:disabled {
+    background-color: #777;
+}
+
+section {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Piano: */
+.piano {
+    border: 1px solid #777;
+    user-select: none;
+}
+
+.key.white {
+    width: 3em;
+    height: 10em;
+    background: #fff;
+    float: left;
+}
+
+.key.white:not(:last-child) {
+    border-right: 1px solid #777;
+}
+
+.key.black {
+    width: 2em;
+    height: 5em;
+    background: #000;
+    position: relative;
+    left: 2em;
+}
+
+.key.white.on {
+    background: #aaa;
+}
+
+.key.black.on {
+    background: #777;
+}
+
+.key span {
+    position: absolute;
+    display: block;
+    width: 3em;
+    height: 10em;
+    line-height: 18em;
+    text-align: center;
+    color: #888;
+    pointer-events: none;
+}
+
+/* Editor: */
+input[type="range"] {
+    width: 25em;
+}
+select {
+    width: 25em;
+}

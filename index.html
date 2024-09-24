@@ -1,189 +1,168 @@
 <!DOCTYPE html>
-<html color-mode="user">
+<html class="has-navbar-fixed-top">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>YouSynth</title>
-  <link rel="stylesheet" href="mvp.css" /> 
+  <link rel="stylesheet" href="modern-normalize.min.css">
+  <link rel="stylesheet" href="Synth.css">
 </head>
 <body>
-  <main>
-    <section>
-      <header>
-        <h1>YouSynth</h1>
-        <p><em>The synthesizer where <u>you</u> control the parameters, to make samples that are uniquely yours.</em></p>
-        <button id="button-start" disabled>START</button>
-        </header>
-    </section>
-    <section>
-        <div class="piano">
-          <div class="key white" midi="60"><span>C4</span><div class="key black" midi="61"></div></div>
-          <div class="key white" midi="62"><span>D</span><div class="key black" midi="63"></div></div>
-          <div class="key white" midi="64"><span>E</span></div>
-          <div class="key white" midi="65"><span>F</span><div class="key black" midi="66"></div></div>
-          <div class="key white" midi="67"><span>G</span><div class="key black" midi="68"></div></div>
-          <div class="key white" midi="69"><span>A</span><div class="key black" midi="70"></div></div>
-          <div class="key white" midi="71"><span>B</span></div>
-          <div class="key white" midi="72"><span>C5</span><div class="key black" midi="73"></div></div>
-          <div class="key white" midi="74"><span>D</span><div class="key black" midi="75"></div></div>
-          <div class="key white" midi="76"><span>E</span></div>
-        </div>
-        <p class="piano-help">Press keys ASDFGHJKL for Middle C4 and up. WE TYU OP are for sharps.</p>
-        <p class="piano-help">Desktop browsers only, sorry. Check back for updates (eg midi).</p>
-    </section>
-    <section>
-      <table>
-        <tr>
-          <td></td>
-          <th>Carrier</th>
-          <th>Modulator</th>
-        </tr>
-        <tr>
-          <th>Wave</th>
-          <td>
-            <select id="carrier-wave">
-              <option value="sine">Sine</option>
-              <option value="square">Square</option>
-              <option value="triangle">Triangle</option>
-              <option value="sawtooth">Sawtooth</option>
-            </select>
-          </td>
-          <td>
-            <select id="modulator-wave">
-              <option value="sine">Sine</option>
-              <option value="square">Square</option>
-              <option value="triangle">Triangle</option>
-              <option value="sawtooth">Sawtooth</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <th>Attack</th>
-          <td>
-            <label id="carrier-attack-label" for="carrier-attack">0.1s</label>
-            <input id="carrier-attack" type="range" min="0.01" max="2" step="0.01">
-          </td>
-          <td>
-            <label id="modulator-attack-label" for="modulator-attack">0.1s</label>
-            <input id="modulator-attack" type="range" min="0.01" max="2" step="0.01">
-          </td>
-        </tr>
-        <tr>
-          <th>Decay</th>
-          <td>
-            <label id="carrier-decay-label" for="carrier-decay">0.1s</label>
-            <input id="carrier-decay" type="range" min="0.01" max="2" step="0.01">
-          </td>
-          <td>
-            <label id="modulator-decay-label" for="modulator-decay">0.1s</label>
-            <input id="modulator-decay" type="range" min="0.01" max="2" step="0.01">
-          </td>
-        </tr>
-        <tr>
-          <th>Sustain</th>
-          <td>
-            <label id="carrier-sustain-label" for="carrier-sustain"></label>
-            <input id="carrier-sustain" type="range" min="0" max="1" step="0.1">
-          </td>
-          <td>
-            <label id="modulator-sustain-label" for="modulator-sustain"></label>
-            <input id="modulator-sustain" type="range" min="0" max="1" step="0.1">
-          </td>
-        </tr>
-        <tr>
-          <th>Release</th>
-          <td>
-            <label id="carrier-release-label" for="carrier-release">0.1s</label>
-            <input id="carrier-release" type="range" min="0.01" max="2" step="0.01">
-          </td>
-          <td>
-            <label id="modulator-release-label" for="modulator-release">0.1s</label>
-            <input id="modulator-release" type="range" min="0.01" max="2" step="0.01">
-          </td>
-        </tr>
-        <tr>
-          <th>Frequency</th>
-          <td>n/a</td>
-          <td>
-            <label id="modulator-multiple-label" for="modulator-release">1x</label>
-            <input id="modulator-multiple" type="range" min="0" max="20" step="1" list="frequencies">
-          </td>
-        </tr>
-        <tr>
-          <th>Amplitude</th>
-          <td>n/a</td>
-          <td>
-            <label id="modulator-amplitude-label" for="modulator-amplitude">0.1s</label>
-            <input id="modulator-amplitude" type="range" min="0" max="4" step="0.1">
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3">
-            <button id="randomise">Randomise</button>
-          </td>
-        </tr>
-      </table>
-      <p>
-        To learn how to customise the parameters, try the following steps:
-        <ol>
-          <li>Disable the modulator by setting Modulator Amplitude to 0.</li>
-          <li>Set the carrier wave to Sine.</li>
-          <li>Experiment with the carrier ADSR values until confident in what they do.</li>
-          <li>Experiment with the various carrier wave options until confident.</li>
-          <li>Choose a basic sounding carrier, then set the Modulator Amplitude to 50%, and Frequency to 1x.</li>
-          <li>Experiment with the modulator ADSR + Wave until confident.</li>
-          <li>Experiment with the modulator Frequency + Amplitude until confident.</li>
-        </ol>
-      </p>
-    </section>
-  </main>
+  <nav>
+    <div><em>YouSynth</em></div>
+    <div>
+      <button id="button-share">Share</button>
+      <button id="button-randomise">Randomise</button>
+      <button id="button-start" disabled>Start</button>
+    </div>
+  </nav>
 
+  <section>
+    <div class="piano">
+      <div class="key white" midi="60"><span>C4</span><div class="key black" midi="61"></div></div>
+      <div class="key white" midi="62"><span>D</span><div class="key black" midi="63"></div></div>
+      <div class="key white" midi="64"><span>E</span></div>
+      <div class="key white" midi="65"><span>F</span><div class="key black" midi="66"></div></div>
+      <div class="key white" midi="67"><span>G</span><div class="key black" midi="68"></div></div>
+      <div class="key white" midi="69"><span>A</span><div class="key black" midi="70"></div></div>
+      <div class="key white" midi="71"><span>B</span></div>
+      <div class="key white" midi="72"><span>C5</span><div class="key black" midi="73"></div></div>
+      <div class="key white" midi="74"><span>D</span><div class="key black" midi="75"></div></div>
+      <div class="key white" midi="76"><span>E</span></div>
+    </div>
+  </section>
+  <section>
+    <table>
+      <tr>
+        <td></td>
+        <td></td>
+        <th>Carrier</th>
+        <td></td>
+        <th>Modulator</th>
+      </tr>
+      <tr>
+        <th>Wave</th>
+        <td></td>
+        <td>
+          <select id="carrier-wave">
+            <option value="sine">Sine</option>
+            <option value="square">Square</option>
+            <option value="triangle">Triangle</option>
+            <option value="sawtooth">Sawtooth</option>
+          </select>
+        </td>
+        <td></td>
+        <td>
+          <select id="modulator-wave">
+            <option value="sine">Sine</option>
+            <option value="square">Square</option>
+            <option value="triangle">Triangle</option>
+            <option value="sawtooth">Sawtooth</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Attack</th>
+        <td>
+          <label id="carrier-attack-label" for="carrier-attack">0.1s</label>
+        </td>
+        <td>
+          <input id="carrier-attack" type="range" min="0.01" max="2" step="0.01">
+        </td>
+        <td>
+          <label id="modulator-attack-label" for="modulator-attack">0.1s</label>
+        </td>
+        <td>
+          <input id="modulator-attack" type="range" min="0.01" max="2" step="0.01">
+        </td>
+      </tr>
+      <tr>
+        <th>Decay</th>
+        <td>
+          <label id="carrier-decay-label" for="carrier-decay">0.1s</label>
+        </td>
+        <td>
+          <input id="carrier-decay" type="range" min="0.01" max="2" step="0.01">
+        </td>
+        <td>
+          <label id="modulator-decay-label" for="modulator-decay">0.1s</label>
+        </td>
+        <td>
+          <input id="modulator-decay" type="range" min="0.01" max="2" step="0.01">
+        </td>
+      </tr>
+      <tr>
+        <th>Sustain</th>
+        <td>
+          <label id="carrier-sustain-label" for="carrier-sustain"></label>
+        </td>
+        <td>
+          <input id="carrier-sustain" type="range" min="0" max="1" step="0.1">
+        </td>
+        <td>
+          <label id="modulator-sustain-label" for="modulator-sustain"></label>
+        </td>
+        <td>
+          <input id="modulator-sustain" type="range" min="0" max="1" step="0.1">
+        </td>
+      </tr>
+      <tr>
+        <th>Release</th>
+        <td>
+          <label id="carrier-release-label" for="carrier-release">0.1s</label>
+        </td>
+        <td>
+          <input id="carrier-release" type="range" min="0.01" max="2" step="0.01">
+        </td>
+        <td>
+          <label id="modulator-release-label" for="modulator-release">0.1s</label>
+        </td>
+        <td>
+          <input id="modulator-release" type="range" min="0.01" max="2" step="0.01">
+        </td>
+      </tr>
+      <tr>
+        <th>Frequency</th>
+        <td></td>
+        <td>n/a</td>
+        <td>
+          <label id="modulator-multiple-label" for="modulator-release">1x</label>
+        </td>
+        <td>
+          <input id="modulator-multiple" type="range" min="0" max="20" step="1" list="frequencies">
+        </td>
+      </tr>
+      <tr>
+        <th>Amplitude</th>
+        <td></td>
+        <td>n/a</td>
+        <td>
+          <label id="modulator-amplitude-label" for="modulator-amplitude">0.1s</label>
+        </td>
+        <td>
+          <input id="modulator-amplitude" type="range" min="0" max="4" step="0.1">
+        </td>
+      </tr>
+    </table>
+  </section>
+  <section>
+    <p>
+      <em>YouSynth is the synthesizer where <u>you</u> control the parameters, to make samples that are uniquely yours. Desktop only.</em><br />
+      Press keys ASDFGHJKL for Middle C4 and up. WE TYU OP are for sharps.<br />
+      To learn how to customise the parameters, try the following steps:
+      <ol>
+        <li>Disable the modulator by setting Modulator Amplitude to 0.</li>
+        <li>Set the carrier wave to Sine.</li>
+        <li>Experiment with the carrier ADSR values until confident in what they do.</li>
+        <li>Experiment with the various carrier wave options until confident.</li>
+        <li>Choose a basic sounding carrier, then set the Modulator Amplitude to 50%, and Frequency to 1x.</li>
+        <li>Experiment with the modulator ADSR + Wave until confident.</li>
+        <li>Experiment with the modulator Frequency + Amplitude until confident.</li>
+      </ol>
+    </p>
+  </section>
   <style>
-    /* Piano: */
-    .piano {
-      border: 1px solid #777;
-      user-select: none;
-    }
-    .key.white {
-      width: 3em;
-      height: 10em;
-      background: #fff;
-      float: left;
-    }
-    .key.white:not(:last-child) {
-      border-right: 1px solid #777;
-    }
-    .key.black {
-      width: 2em;
-      height: 5em;
-      background: #000;
-      position: relative;
-      left: 2em;
-    }
-    .key.white.on {
-      background: #aaa;
-    }
-    .key.black.on {
-      background: #777;
-    }
-    .key span {
-      position: absolute;
-      display: block;
-      width: 3em;
-      height: 10em;
-      line-height: 18em;
-      text-align: center;
-      color: #888;
-      pointer-events: none;
-    }
-    .piano-help {
-      text-align: center;
-    }
-
-    /* Editor: */
-    input[type="range"] {
-      width: 25em;
-    }
   </style>
-  
   <script src="SynthMain.js" type="module"></script>
 </body>
 </html>
