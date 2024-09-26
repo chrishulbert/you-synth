@@ -65,6 +65,7 @@ class Envelope {
 }
 
 class Voice {
+    amplitude = 0
     cycle = 0
     carrierEnvelope = new Envelope()
     carrierFrequency = 440
@@ -85,8 +86,9 @@ class Voice {
         }
     }
 
-    play(midiNote) {
+    play(midiNote, velocity) {
         this.midiNote = midiNote
+        this.amplitude = velocity
         this.cycle = 0;
         this.modulatorEnvelope.value = 0
         this.modulatorEnvelope.state = StateAttacking
@@ -104,7 +106,7 @@ class Voice {
         const modulatorDelta = valueForWave(this.modulatorWave, this.modulatorFrequency * time)
             * this.modulatorEnvelope.value * this.modulatorAmplitude;
         const value = valueForWave(this.carrierWave, this.carrierFrequency * time + modulatorDelta)
-            * this.carrierEnvelope.value;
+            * this.carrierEnvelope.value * this.amplitude;
 
         // Do updates.
         this.cycle++;
@@ -127,7 +129,7 @@ class SynthProcessor extends AudioWorkletProcessor {
             const parts = e.data.split(',')
             const command = parts[0]
             if (command == 'p') {
-                this.play(parseInt(parts[1]))
+                this.play(parseInt(parts[1]), parseFloat(parts[2]))
             } else if (command == 'r') {
                 this.release(parseInt(parts[1]))
             } else if (command == 'ra') {
@@ -184,8 +186,8 @@ class SynthProcessor extends AudioWorkletProcessor {
         return oldestVoice
     }
 
-    play(midiNote) {
-        this.freeestVoice().play(midiNote)
+    play(midiNote, velocity) {
+        this.freeestVoice().play(midiNote, velocity)
     }
 
     release(midiNote) {

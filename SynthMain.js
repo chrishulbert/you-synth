@@ -31,10 +31,10 @@ const onStartButton = async () => {
     }
 }
 const keysThatAreDown = {}
-const onDown = async (midi) => {
+const onDown = async (midi, velocity) => { // Velocity should be 0-1.
     if (!context) { await onStartButton() } // Auto-start.
     if (keysThatAreDown[midi] === true) { return } // Already down, ignore key-repeat.
-    node?.port.postMessage(`p,${midi}`)
+    node?.port.postMessage(`p,${midi},${velocity.toFixed(2)}`)
     keysThatAreDown[midi] = true
     document.querySelector(`.key[midi="${midi}"]`)?.classList.add('on')
 }
@@ -46,7 +46,7 @@ const onUp = (midi) => {
 }
 
 const onKeyboardMouseDown = async (e) => {
-    await onDown(parseInt(e.target.getAttribute('midi')))
+    await onDown(parseInt(e.target.getAttribute('midi')), 1)
 }
 const onKeyboardMouseUp = (e) => {
     onUp(parseInt(e.target.getAttribute('midi')))
@@ -76,7 +76,7 @@ const keysToMidi = {
 document.addEventListener('keydown', async (event) => {
     const midi = keysToMidi[event.key.toLowerCase()]
     if (!midi) { return } // Not one of the recognised keys
-    await onDown(midi)
+    await onDown(midi, 1)
 });
 document.addEventListener('keyup', (event) => {
     const midi = keysToMidi[event.key.toLowerCase()]
@@ -104,7 +104,7 @@ const onMidiMessage = (event) => {
     const note = event.data[1]; // middle c = 60.
     const velocity = event.data[2]; // 0=release, 1=softest, 60=usual press, 127=hardest.
     if (messageHighNibble == 9 && velocity > 0) { // Note on. 
-        onDown(note) // TODO velocity.
+        onDown(note, velocity / 127)
     } else if (messageHighNibble == 8 || (messageHighNibble == 9 && velocity == 0)) { // Note off.
         onUp(note)
     }
@@ -113,8 +113,11 @@ const onMidiMessage = (event) => {
 const onConnectMidi = async () => {
     try {
         if (!context) { await onStartButton() } // Auto-start.
+        if (!navigator.requestMIDIAccess) {
+            throw new Error('This browser does not support MIDI')
+        }
         const midiAccess = await navigator.requestMIDIAccess()
-        const status = await navigator.permissions.query({ name: 'midi', sysex: true })
+        const status = await navigator.permissions.query({ name: 'midi' })
         if (status.state != 'granted') {
             throw new Error(`Permission not granted, instead it is: ${status.state}`)
         }
