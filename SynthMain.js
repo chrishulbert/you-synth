@@ -97,6 +97,43 @@ const onShare = () => {
     })
 }
 
+const onMidiMessage = (event) => {
+    // Event.data is a Uint8Array.
+    if (event.data.length < 3) { return }
+    const messageHighNibble = event.data[0] >> 4 // 9=note on, 8=note off.
+    const note = event.data[1]; // middle c = 60.
+    const velocity = event.data[2]; // 0=release, 1=softest, 60=usual press, 127=hardest.
+    if (messageHighNibble == 9 && velocity > 0) { // Note on. 
+        onDown(note) // TODO velocity.
+    } else if (messageHighNibble == 8 || (messageHighNibble == 9 && velocity == 0)) { // Note off.
+        onUp(note)
+    }
+}
+
+const onConnectMidi = async () => {
+    try {
+        if (!context) { await onStartButton() } // Auto-start.
+        const midiAccess = await navigator.requestMIDIAccess()
+        const status = await navigator.permissions.query({ name: 'midi', sysex: true })
+        if (status.state != 'granted') {
+            throw new Error(`Permission not granted, instead it is: ${status.state}`)
+        }
+        if (midiAccess.inputs.size == 0) {
+            throw new Error(`No MIDI keyboards are connected.`)
+        }
+        const names = []
+        for (const [id, input] of midiAccess.inputs) {
+            names.push(`${input.manufacturer} ${input.name}`)
+            input.onmidimessage = onMidiMessage
+        }
+        const allNames = names.join(', ')
+        alert(`Connected to ${allNames}`)
+    } catch (err) {
+        alert(err)
+    }
+}
+
+// Things to do at startup time:
 document.addEventListener("DOMContentLoaded", async () => {
     // Set up the 'start' button.
     const button = document.getElementById('button-start')
@@ -105,6 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Setup share.
     document.getElementById('button-share').onclick = onShare
+    document.getElementById('button-midi').onclick = onConnectMidi
 
     // Set up the keys.
     for (let k of document.getElementsByClassName('key')) {

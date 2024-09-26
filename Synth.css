@@ -42,8 +42,8 @@ section {
 }
 
 .key.white {
-    width: 3em;
-    height: 10em;
+    width: 6vh;
+    height: 20vh;
     background: #fff;
     float: left;
 }
@@ -53,11 +53,11 @@ section {
 }
 
 .key.black {
-    width: 2em;
-    height: 5em;
+    width: 4vh;
+    height: 10vh;
     background: #000;
     position: relative;
-    left: 2em;
+    left: 4vh;
 }
 
 .key.white.on {
@@ -71,9 +71,9 @@ section {
 .key span {
     position: absolute;
     display: block;
-    width: 3em;
-    height: 10em;
-    line-height: 18em;
+    width: 6vh;
+    height: 20vh;
+    line-height: 36vh;
     text-align: center;
     color: #888;
     pointer-events: none;
