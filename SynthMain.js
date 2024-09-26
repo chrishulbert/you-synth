@@ -1,11 +1,10 @@
 let context = undefined
 let node = undefined
+const sampleRate = 44100
 
 const startSynth = async () => {
     if (context) { return } // No double-init.
-    context = new AudioContext({
-        sampleRate: 44100,
-    });
+    context = new AudioContext({ sampleRate });
     await context.audioWorklet.addModule('SynthProcessor.js');
     // await context.audioWorklet.addModule('SynthProcessor.js?developmentCacheBuster=' + (new Date().getTime()));
     node = new AudioWorkletNode(context, 'synthProcessor', { 
@@ -146,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Setup share.
     document.getElementById('button-share').onclick = onShare
     document.getElementById('button-midi').onclick = onConnectMidi
+    document.getElementById('button-download-wav').onclick = onDownloadWav
 
     // Set up the keys.
     for (let k of document.getElementsByClassName('key')) {
@@ -453,4 +453,95 @@ const setupParameterUIOnLoad = () => {
         modulatorMultiple.value = Math.round(20 * Math.random())
         modulatorMultiple.oninput({ target: modulatorMultiple })
     }
+}
+
+// -=[ WAV file generation below ]=-
+
+// Wraps raw data into a riff chunk.
+const riffChunk = (data, name) => {
+    const dataLen = data.length
+    const riff = new Uint8Array(dataLen + 8)
+    riff[0] = name.charCodeAt(0)
+    riff[1] = name.charCodeAt(1)
+    riff[2] = name.charCodeAt(2)
+    riff[3] = name.charCodeAt(3)
+    riff[4] = dataLen & 0xff
+    riff[5] = (dataLen >> 8) & 0xff
+    riff[6] = (dataLen >> 16) & 0xff
+    riff[7] = (dataLen >> 24) & 0xff
+    riff.set(data, 8)
+    return riff
+}
+
+const waveFmt = () => {
+    const bytesPerBlock = 2; // 16 bit mono.
+    const bytesPerSecond = sampleRate * bytesPerBlock
+    const fmt = new Uint8Array(16)
+    fmt[0]=1; fmt[1]=0 // 1=PCM.
+    fmt[2]=1; fmt[3]=0 // 1 channel.
+    fmt[4]=sampleRate & 0xff
+    fmt[5]=(sampleRate >> 8) & 0xff
+    fmt[6]=(sampleRate >> 16) & 0xff
+    fmt[7]=(sampleRate >> 24) & 0xff
+    fmt[8]=bytesPerSecond & 0xff
+    fmt[9]=(bytesPerSecond >> 8) & 0xff
+    fmt[10]=(bytesPerSecond >> 16) & 0xff
+    fmt[11]=(bytesPerSecond >> 24) & 0xff
+    fmt[12]=bytesPerBlock & 0xff
+    fmt[13]=(bytesPerBlock >> 8) & 0xff
+    fmt[14]=16; fmt[15]=0 // Bits per sample.
+    return fmt
+}
+
+const waveData = () => {
+    const arr = new Uint8Array(1)
+    arr[0]=255
+    return arr
+}
+
+const riffFile = (fmt, data) => {
+    const riff = "RIFF"
+    const wave = "WAVE"
+    const reportedSize = fmt.length + data.length
+    const arr = new Uint8Array(12 + fmt.length + data.length)
+    arr[0] = riff.charCodeAt(0)
+    arr[1] = riff.charCodeAt(1)
+    arr[2] = riff.charCodeAt(2)
+    arr[3] = riff.charCodeAt(3)
+    arr[4] = reportedSize & 0xff
+    arr[5] = (reportedSize >> 8) & 0xff
+    arr[6] = (reportedSize >> 16) & 0xff
+    arr[7] = (reportedSize >> 24) & 0xff
+    arr[8] = wave.charCodeAt(0)
+    arr[9] = wave.charCodeAt(1)
+    arr[10] = wave.charCodeAt(2)
+    arr[11] = wave.charCodeAt(3)
+    arr.set(fmt, 12)
+    arr.set(data, 12 + fmt.length)
+    return arr
+}
+
+const generateWaveFile = () => {
+    const fmtRiff = riffChunk(waveFmt(), 'fmt ')
+    const dataRiff = riffChunk(waveData(), 'data')
+    const file = riffFile(fmtRiff, dataRiff)
+    return file
+}
+
+function onDownloadWav() {
+    alert('Coming soon!')
+    return
+
+    const wave = generateWaveFile()
+    const blob = new Blob([wave], { type: 'application/octet-stream' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.style.display = 'none'
+    link.href = url
+    link.download = 'sample.wav'
+    document.body.appendChild(link)
+    link.click()
+    // Tidy up to save memory.
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
 }
