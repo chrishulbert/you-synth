@@ -2,5 +2,5 @@ help:
 	cat Makefile
 
 serve:
-	open http://localhost:8000
-	python3 -m http.server
+	open https://localhost
+	caddy file-server --domain localhost

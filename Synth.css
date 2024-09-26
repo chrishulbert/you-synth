@@ -2,10 +2,16 @@
 nav {
     display: flex;
     justify-content: space-between;
-    background-color: rgba(0, 0, 0, 0.1);
-    height: 4em;
+    background-color: #7ef;
     align-items: center;
     padding: 0.5em;
+    gap: 1em;
+}
+nav div.buttons {
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
+    justify-content: right;
 }
 
 button {
@@ -39,6 +45,7 @@ section {
 .piano {
     border: 1px solid #777;
     user-select: none;
+    -webkit-user-select: none;
 }
 
 .key.white {
@@ -48,8 +55,8 @@ section {
     float: left;
 }
 
-.key.white:not(:last-child) {
-    border-right: 1px solid #777;
+.key.white:not(:first-child) {
+    border-left: 1px solid #777;
 }
 
 .key.black {
@@ -78,11 +85,16 @@ section {
     color: #888;
     pointer-events: none;
 }
+@media only screen and (max-width: 600px) {
+    .extra {
+        display: none;
+    }
+}
 
 /* Editor: */
 input[type="range"] {
-    width: 25em;
+    width: 20vw;
 }
 select {
-    width: 25em;
+    width: 20vw;
 }
