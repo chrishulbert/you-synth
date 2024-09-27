@@ -472,7 +472,7 @@ const riffChunk = (data, name) => {
     riff.set(data, 8)
     return riff
 }
-
+// The 'fmt' chunk in the wav file.
 const waveFmt = () => {
     const bytesPerBlock = 2; // 16 bit mono.
     const bytesPerSecond = sampleRate * bytesPerBlock
@@ -492,13 +492,26 @@ const waveFmt = () => {
     fmt[14]=16; fmt[15]=0 // Bits per sample.
     return fmt
 }
-
+// Creates the 'data' chunk for the wav file.
 const waveData = () => {
-    const arr = new Uint8Array(1)
-    arr[0]=255
-    return arr
+    const floats = waveFloats()
+    // Get the scale.
+    let maxAmplitude = 0
+    for (const x of floats) {
+        if (Math.abs(x) > maxAmplitude) {
+            maxAmplitude = Math.abs(x)
+        }
+    }
+    // Start with ArrayBuffer because it has setInt16.
+    const buf = new ArrayBuffer(floats.length * 2) // *2 because 16-bits.
+    const view = new DataView(buf)
+    floats.forEach((x, i) => {
+        const i16 = x / maxAmplitude * 32767 // i16 range is -32768...32767
+        view.setInt16(i * 2, i16, true) // true = little endian.
+    })
+    return new Uint8Array(buf)
 }
-
+// Creates a riff wav file out of the given fmt and data chunks.
 const riffFile = (fmt, data) => {
     const riff = "RIFF"
     const wave = "WAVE"
@@ -520,28 +533,80 @@ const riffFile = (fmt, data) => {
     arr.set(data, 12 + fmt.length)
     return arr
 }
-
+// Orchestrates making the chunks, wrapping them, combining to the riff wav file.
 const generateWaveFile = () => {
     const fmtRiff = riffChunk(waveFmt(), 'fmt ')
     const dataRiff = riffChunk(waveData(), 'data')
     const file = riffFile(fmtRiff, dataRiff)
     return file
 }
-
+// Make the wav file sound as floats.
+// Apologies, much of this is duplicated logic from SynthProcessor.js
+// I couldn't think of a nice way of sharing code without making it super complex, plus
+// there are some differences, so forgive me that this is a bit unnecessarily duplicated.
+function waveFloats() {
+    const tau = Math.PI * 2
+    function valueForWave(type, x) {
+        if (type == WaveSine) { return Math.sin(x * tau) }
+        if (type == WaveSquare) { return 4. * Math.floor(x) - 2. * Math.floor(2. * x) + 1 }
+        if (type == WaveTriangle) { return 2. * Math.abs(2. * (x + 0.25 - Math.floor(x + 0.75))) - 1. }
+        if (type == WaveSawtooth) { return 2. * (x - Math.floor(x + 0.5)) }
+        return 0
+    }
+    // Returns a function that takes time and emits amplitude.
+    function envelope(attack, decay, sustainAmplitude, release, startReleasingTime) {
+        const sustainDuration = startReleasingTime - (attack + decay)
+        return (t) => {
+            if (t <= attack) {
+                return t / attack // Attacking.
+            } else if (t <= attack + decay) {
+                const progress = (t - attack) / decay
+                return 1 - progress * (1 - sustainAmplitude) // Decaying.
+            } else if (t <= attack + decay + sustainDuration) {
+                return sustainAmplitude // Sustaining.
+            } else { // Releasing.
+                const releasingTime = (t - (attack + decay + sustainDuration))
+                const releasedAmount = releasingTime / release
+                return Math.max(0, // Dont let it go below 0.
+                    sustainAmplitude - releasedAmount)
+            }
+        }
+    }
+    // To make them release at same time, figure out when each would like to release,
+    // then release both at that later time.
+    const niceSustainTime = 1
+    const carrierReleaseTime = parameters.carrierAttack + parameters.carrierDecay + niceSustainTime
+    const modulatorReleaseTime = parameters.modulatorAttack + parameters.modulatorDecay + niceSustainTime
+    const startReleasingTime = Math.max(carrierReleaseTime, modulatorReleaseTime)
+    const carrierEnvelope = envelope(parameters.carrierAttack, parameters.carrierDecay, parameters.carrierSustain, parameters.carrierRelease, startReleasingTime)
+    const modulatorEnvelope = envelope(parameters.modulatorAttack, parameters.modulatorDecay, parameters.modulatorSustain, parameters.modulatorRelease, startReleasingTime)
+    const duration = startReleasingTime + parameters.carrierRelease
+    const samples = Math.ceil(duration * sampleRate)
+    const midiNote = 60 // Middle C4
+    const carrierFrequency = Math.pow(2, (midiNote - 69) / 12) * 440
+    const modulatorFrequency = carrierFrequency * parameters.modulatorMultiple
+    const wave = []
+    for (let i=0; i<samples; i++) {
+        const time = i / sampleRate
+        const modulatorDelta = valueForWave(parameters.modulatorWave, modulatorFrequency * time)
+            * modulatorEnvelope(time) * parameters.modulatorAmplitude;
+        const value = valueForWave(parameters.carrierWave, carrierFrequency * time + modulatorDelta)
+            * carrierEnvelope(time);
+        wave.push(value)
+    }
+    return wave
+}
 function onDownloadWav() {
-    alert('Coming soon!')
-    return
-
     const wave = generateWaveFile()
     const blob = new Blob([wave], { type: 'application/octet-stream' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.style.display = 'none'
     link.href = url
-    link.download = 'sample.wav'
+    link.download = 'YouSynthSample.wav' // TODO bake the params into the filename one day?
     document.body.appendChild(link)
     link.click()
-    // Tidy up to save memory.
+    // Tidy up to save memory:
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
 }
