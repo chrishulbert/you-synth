@@ -88,6 +88,10 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+const onAbout = () => {
+    window.location.assign('https://www.splinter.com.au/2024/10/09/maths-of-fm-synthesis/')
+}
+
 const onShare = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
       alert('This instrument and its parameters copied to the clipboard!');
@@ -146,6 +150,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('button-share').onclick = onShare
     document.getElementById('button-midi').onclick = onConnectMidi
     document.getElementById('button-download-wav').onclick = onDownloadWav
+    document.getElementById('button-about').onclick = onAbout
 
     // Set up the keys.
     for (let k of document.getElementsByClassName('key')) {
